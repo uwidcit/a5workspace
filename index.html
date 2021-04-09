@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+ 
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+ 
+    <title>Poke Dextr</title>
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style>
+      body, html{
+        height: 100vh;
+      }
+
+      #listing{
+      overflow-y: scroll;
+      max-height: 70vh;
+      }
+      
+      aside, article{
+        max-height: 25vh;
+      }
+
+    </style>
+  </head>
+
+  <body>
+        <nav class="teal nav-extended">
+          <div class="row" style="padding:10px">
+            <div class="col s12 m3">
+              <a href="#" class="brand-logo">Poke Dextr</a>
+            </div>
+            
+            <div class="col input-field m6" >
+                <input placeholder="Student ID" style="border-radius:4px; color:white; background-color:#017c70" id="student_id" type="text">
+                <label for="last_name" style="color:white">Student ID</label>
+            </div>
+
+            <div class="col m3">
+              <button class="waves-effect waves-light btn" id="loadBtn" onclick="getMyPokemon()">Load Pkmn</button>
+            </div>
+          
+          </div>
+
+        </nav>
+        
+      <div id="list" class="row">
+            <aside class="col s0 m3" >
+              <div class="collection" id="listing">
+                
+              </div>
+              <div class="row">
+                  <div class="col">
+                      <button id="prevBtn" class="waves-effect waves-light btn-small" disabled onclick="prev()">Prev</button>
+                      <button id="nextBtn" class="waves-effect waves-light btn-small"  onclick="next()">Next</button>
+                  </div>
+              </div>
+            </aside>
+            <article class="col m4">
+                <h1 style="font-size: 2em;">Selected Pokemon</h1>
+                <div id="result">
+                    
+                </div>
+            </article>
+            <article class="col m5" id="result">
+                <h1 style="font-size: 2em;">Your Pokemon</h1>
+                <table class="col m12">
+                    <thead>
+                      <tr>
+                          <th>Name</th>
+                          <th>Pokemon</th>
+                      </tr>
+                    </thead>
+        
+                    <tbody id="myPokeListing">
+                     
+                    </tbody>
+                  </table>
+            </article>
+      </div>
+
+    <script src="https://code.iconify.design/1/1.0.4/iconify.min.js"></script>
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        const minPokemon = 0;
+        const maxPokemon = 964;
+        const DEFAULT_LIMIT = 50;
+        const DEFAULT_OFFSET = 0;
+
+        const server = "https://pokedextr-api.herokuapp.com";
+
+        let count = 0;
+
+        async function sendRequest(url, method, data){
+            const options = {method};
+            if(data){
+                options.body = JSON.stringify(data);
+                options.headers = {'Content-Type':'application/json'};
+            }
+            let response = await fetch(url, options);
+            return response.json();
+        }
+
+        function next(){
+            document.querySelector("#prevBtn").removeAttribute('disabled');
+            if(count < maxPokemon)
+                count+= DEFAULT_OFFSET;
+            if(count + DEFAULT_OFFSET > maxPokemon)
+            document.querySelector("#nextBtn").setAttribute('disabled', true);
+            loadListing(DEFAULT_LIMIT, count);
+        }
+
+        function prev(){
+            document.querySelector("#nextBtn").removeAttribute('disabled');
+            if(count > minPokemon)
+                count-= DEFAULT_OFFSET;
+            if(count - DEFAULT_OFFSET < minPokemon)
+                document.querySelector("#prevBtn").setAttribute('disabled', true);
+            loadListing(DEFAULT_LIMIT, count);
+        }
+
+        //gets the id from the id text field or prompts the user if the field is empty
+        function getId(){
+            let id_input = document.querySelector('#student_id');
+            let student_id;
+            if(id_input.value === ""){
+                student_id = prompt("Please enter student ID");
+                id_input.value = student_id;
+            }
+            return id_input.value;
+        }
+
+        async function loadListing(limit=DEFAULT_LIMIT, offset=DEFAULT_OFFSET){
+        
+            let listingData = await sendRequest(`${server}/pokemon?limit=${limit}&offset=${offset}`, 'GET');
+            let listing = document.querySelector('#listing');
+            let html = "";
+
+            for(let pokemon of listingData){
+                html+= `<a href="#listing" id="${pokemon.name}" onclick="getPokemon('${pokemon.pid}')" class="collection-item">${pokemon.name}</a>`
+            }
+
+            listing.innerHTML = html;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            M.Sidenav.init(document.querySelectorAll('.sidenav'));
+            M.Tabs.init(document.querySelectorAll('.tabs'));
+            loadListing();
+        });
+        
+        //*********************** implement the functions below ***********************************
+        async function getMyPokemon(){
+            let student_id = getId();
+        }
+
+        async function getPokemon(pid){
+        
+        }
+        
+        function displayPokemon(pokemon){
+            
+        }
+
+        function displayMyPokemon(mypokemon){
+           
+        }
+
+        async function catchPokemon(pid){
+            const id = getId();
+            const name = prompt('Enter pokemon name');
+
+        }
+
+
+    </script>
+
+  </body>
+</html>
